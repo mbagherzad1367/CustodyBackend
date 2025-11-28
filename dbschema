@@ -1,0 +1,150 @@
+create table asset
+(
+    id          serial
+        primary key,
+    name        varchar(255),
+    "assetId"   varchar(255),
+    icon        varchar(255),
+    "createdAt" timestamp with time zone,
+    "updatedAt" timestamp with time zone,
+    "deletedAt" timestamp with time zone
+);
+
+alter table asset
+    owner to vaultadminpgdb;
+
+create table snapshot
+(
+    id           serial
+        primary key,
+    address      varchar(255),
+    "walletName" varchar(255),
+    "assetId"    varchar(255),
+    balance      double precision default '0'::double precision,
+    "vaultId"    varchar(255),
+    "createdAt"  timestamp with time zone,
+    "updatedAt"  timestamp with time zone,
+    "deletedAt"  timestamp with time zone
+);
+
+alter table snapshot
+    owner to vaultadminpgdb;
+
+create table "user"
+(
+    id              serial
+        primary key,
+    "userId"        uuid                     not null
+        unique,
+    firstname       varchar(255)             not null,
+    lastname        varchar(255)             not null,
+    password        varchar(255)             not null,
+    email           varchar(255)             not null
+        unique,
+    phone           varchar(255)             not null
+        unique,
+    "tfaEnabled"    boolean default false,
+    "authSecret"    varchar(255),
+    countrycode     varchar(255),
+    "deletedAt"     timestamp with time zone,
+    "createdAt"     timestamp with time zone not null,
+    "updatedAt"     timestamp with time zone not null,
+    otp             varchar,
+    "otpExpiresAt"  timestamp with time zone,
+    "isOTPVerified" boolean default false
+);
+
+alter table "user"
+    owner to vaultadminpgdb;
+
+create table "adminWallet"
+(
+    id           serial
+        primary key,
+    "userId"     uuid not null
+        references "user" ("userId")
+            on update cascade on delete cascade,
+    "assetId"    varchar(255),
+    address      varchar(255),
+    "vaultId"    integer,
+    mnemonic     varchar(255),
+    "privateKey" varchar(255),
+    "publicKey"  varchar(255),
+    balance      double precision default '0'::double precision,
+    network      varchar(255),
+    "createdAt"  timestamp with time zone,
+    "updatedAt"  timestamp with time zone,
+    "deletedAt"  timestamp with time zone
+);
+
+alter table "adminWallet"
+    owner to vaultadminpgdb;
+
+create table transaction
+(
+    id                serial
+        primary key,
+    "userId"          uuid not null
+        references "user" ("userId")
+            on update cascade on delete cascade,
+    "transactionId"   uuid not null
+        unique,
+    amount            double precision,
+    "assetId"         varchar(255),
+    "sourceAddress"   varchar(255),
+    "targetAddress"   varchar(255),
+    "txHash"          varchar(255),
+    status            varchar(255),
+    "subStatus"       varchar(255),
+    note              varchar(255),
+    "userType"        varchar(255),
+    "transactionType" varchar(255),
+    "createdAt"       timestamp with time zone,
+    "updatedAt"       timestamp with time zone,
+    "deletedAt"       timestamp with time zone
+);
+
+alter table transaction
+    owner to vaultadminpgdb;
+
+create table wallet
+(
+    id           serial
+        primary key,
+    "userId"     uuid not null
+        references "user" ("userId")
+            on update cascade on delete cascade,
+    address      varchar(255),
+    "walletName" varchar(255),
+    "assetId"    varchar(255),
+    "vaultId"    varchar(255),
+    mnemonic     varchar(255),
+    "privateKey" varchar(255),
+    "publicKey"  varchar(255),
+    balance      double precision default '0'::double precision,
+    "createdAt"  timestamp with time zone,
+    "updatedAt"  timestamp with time zone,
+    "deletedAt"  timestamp with time zone
+);
+
+alter table wallet
+    owner to vaultadminpgdb;
+
+create table "whitelistedAddress"
+(
+    id          serial
+        primary key,
+    name        varchar(255),
+    "userId"    uuid not null
+        references "user" ("userId")
+            on update cascade on delete cascade,
+    address     varchar(255),
+    "assetId"   varchar(255),
+    "createdAt" timestamp with time zone,
+    "updatedAt" timestamp with time zone,
+    "deletedAt" timestamp with time zone
+);
+
+alter table "whitelistedAddress"
+    owner to vaultadminpgdb;
+
